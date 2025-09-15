@@ -9,21 +9,12 @@ namespace Trie;
 /// </summary>
 public class Trie
 {
-    private class TrieNode
-    {
-        public readonly Dictionary<char, TrieNode> Children = new();
-        public bool IsEnd;
-        public int PrefixCount;
-    }
-
-    private TrieNode node = new();
+    private readonly TrieNode root = new();
 
     /// <summary>
     /// Gets the number of words added to the tree.
     /// </summary>
     public int WordCount { get; private set; }
-
-    private readonly TrieNode root = new TrieNode();
 
     /// <summary>
     /// Add a new word into the trie.
@@ -157,5 +148,14 @@ public class Trie
         }
 
         return current.PrefixCount;
+    }
+
+    private class TrieNode
+    {
+        public Dictionary<char, TrieNode> Children { get; } = new();
+
+        public bool IsEnd { get; set; }
+
+        public int PrefixCount { get; set; }
     }
 }
