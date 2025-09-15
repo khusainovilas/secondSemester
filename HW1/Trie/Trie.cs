@@ -18,12 +18,10 @@ public class Trie
 
     private TrieNode node = new();
 
-    private int wordCount = 0;
-
     /// <summary>
     /// Gets the number of words added to the tree.
     /// </summary>
-    public int WordCount => this.wordCount;
+    public int WordCount { get; private set; }
 
     private readonly TrieNode root = new TrieNode();
 
@@ -59,7 +57,7 @@ public class Trie
         }
 
         current.IsEnd = true;
-        this.wordCount++;
+        this.WordCount++;
         return true;
     }
 
@@ -122,7 +120,7 @@ public class Trie
         }
 
         current.IsEnd = false;
-        this.wordCount--;
+        this.WordCount--;
 
         foreach (var trieNode in path)
         {
@@ -143,7 +141,7 @@ public class Trie
     {
         if (prefix is null || string.IsNullOrWhiteSpace(prefix))
         {
-            return this.wordCount;
+            return this.WordCount;
         }
 
         var current = this.root;
