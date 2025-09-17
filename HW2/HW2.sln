@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SyntaxTree", "SyntaxTree\SyntaxTree.csproj", "{6C1B7790-DBF9-4146-A87B-83D95A0D5C54}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SyntaxTree.Tests", "SyntaxTree.Tests\SyntaxTree.Tests.csproj", "{29D5F19D-35BC-49BE-8724-369258B5717D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6C1B7790-DBF9-4146-A87B-83D95A0D5C54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C1B7790-DBF9-4146-A87B-83D95A0D5C54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C1B7790-DBF9-4146-A87B-83D95A0D5C54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C1B7790-DBF9-4146-A87B-83D95A0D5C54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{29D5F19D-35BC-49BE-8724-369258B5717D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29D5F19D-35BC-49BE-8724-369258B5717D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29D5F19D-35BC-49BE-8724-369258B5717D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29D5F19D-35BC-49BE-8724-369258B5717D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
