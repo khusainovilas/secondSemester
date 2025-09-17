@@ -1,3 +1,3 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿namespace SyntaxTree;
 
-Console.WriteLine("Hello, World!");
+public class Program;
