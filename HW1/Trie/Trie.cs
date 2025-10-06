@@ -59,7 +59,7 @@ public class Trie
     /// <returns>Returns true if the word exists in the trie.</returns>
     public bool Contains(string? word)
     {
-        if (word is null || string.IsNullOrWhiteSpace(word))
+        if (word is null)
         {
             return false;
         }
@@ -86,7 +86,7 @@ public class Trie
     /// <returns>Returns true if the word was present in the trie.</returns>
     public bool Remove(string? word)
     {
-        if (word is null || string.IsNullOrWhiteSpace(word))
+        if (word is null)
         {
             return false;
         }
@@ -130,7 +130,7 @@ public class Trie
     /// <returns>The count of words that begin with the specified prefix.</returns>
     public int HowManyStartsWithPrefix(string? prefix)
     {
-        if (prefix is null || string.IsNullOrWhiteSpace(prefix))
+        if (prefix is null)
         {
             return this.WordCount;
         }
