@@ -23,7 +23,7 @@ public class Trie
     /// <returns>Returns false if the word is already present.</returns>
     public bool Add(string? word)
     {
-        if (word is null || string.IsNullOrWhiteSpace(word))
+        if (word is null)
         {
             return false;
         }
