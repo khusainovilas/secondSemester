@@ -16,9 +16,7 @@ public class TrieTest
     /// </summary>
     [SetUp]
     public void Setup()
-    {
-        this.trie = new Trie();
-    }
+        => this.trie = new();
 
     /// <summary>
     /// Tests Add method when inserting fresh words.
