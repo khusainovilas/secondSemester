@@ -107,4 +107,18 @@ public class SyntaxTreeTests
             Assert.That(node.ToStringRepresentation(), Is.EqualTo("(+ 1 2)"));
         });
     }
+
+    // Test Program.Main with testFile.txt containing valid expression.
+    [Test]
+    public void Program_Main_ValidFileOutputs()
+    {
+        var filePath = Path.Combine(AppContext.BaseDirectory, "testFile.txt");
+        Program.Main(new[] { filePath });
+        var output = this.consoleOutput.ToString().Trim();
+        Assert.Multiple(() =>
+        {
+            Assert.That(output, Does.Contain("The tree: (+ 1 2)"));
+            Assert.That(output, Does.Contain("The result: 3"));
+        });
+    }
 }
