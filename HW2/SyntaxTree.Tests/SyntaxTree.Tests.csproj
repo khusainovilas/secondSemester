@@ -35,5 +35,10 @@
     <ItemGroup>
       <ProjectReference Include="..\SyntaxTree\SyntaxTree.csproj" />
     </ItemGroup>
-
+    
+    <ItemGroup>
+        <None Update="testFile.txt">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
 </Project>
