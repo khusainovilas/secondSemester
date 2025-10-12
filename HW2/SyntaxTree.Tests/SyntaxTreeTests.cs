@@ -112,7 +112,7 @@ public class SyntaxTreeTests
     [Test]
     public void Program_Main_ValidFileOutputs()
     {
-        const string filePath = "testFile.txt";
+        var filePath = Path.Combine(AppContext.BaseDirectory, "TestFile.txt");
         Program.Main(new[] { filePath });
         var output = this.consoleOutput.ToString().Trim();
         Assert.Multiple(() =>
