@@ -27,14 +27,6 @@ public class BinaryOperationNode : AbstractNode
         this.Validate();
     }
 
-    private void Validate()
-    {
-        if (!"+-*/".Contains(this.operation))
-        {
-            throw new ArgumentException("Invalid operator. Supported: +, -, *, /.", nameof(this.operation));
-        }
-    }
-
     /// <inheritdoc/>
     public override int Calculate()
     {
@@ -56,5 +48,13 @@ public class BinaryOperationNode : AbstractNode
     {
         return
             $"({this.operation} {this.leftNode.ToStringRepresentation()} {this.rightNode.ToStringRepresentation()})";
+    }
+
+    private void Validate()
+    {
+        if (!"+-*/".Contains(this.operation))
+        {
+            throw new ArgumentException("Invalid operator. Supported: +, -, *, /.", nameof(this.operation));
+        }
     }
 }
