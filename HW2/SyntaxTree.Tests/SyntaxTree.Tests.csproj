@@ -32,4 +32,8 @@
         <AdditionalFiles Include="stylecop.json" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\SyntaxTree\SyntaxTree.csproj" />
+    </ItemGroup>
+
 </Project>
