@@ -5,10 +5,11 @@
 namespace CalculatorCore;
 
 using System.ComponentModel;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 
 /// <summary>
-/// Calculator logic that processes the input of numbers, operators, and calculations.
+/// Handles the calculator's core logic: input processing, arithmetic operations, and display updates.
 /// </summary>
 public class CalculatorLogic : INotifyPropertyChanged
 {
@@ -16,14 +17,15 @@ public class CalculatorLogic : INotifyPropertyChanged
     private string? pendingOperator;
     private string? display = "0";
     private bool isNewInput = true;
-    private string? inputBuffer = string.Empty;
+    private string inputBuffer = string.Empty;
+    private bool hasError;
 
     /// <inheritdoc/>
     public event PropertyChangedEventHandler? PropertyChanged;
 
     /// <summary>
-    /// Gets the value displayed on the calculator screen.
-    /// Updates the UI via data binding when changing.
+    /// Gets the value shown on the calculator screen.
+    /// Automatically updates the UI when changed.
     /// </summary>
     public string? Display
     {
@@ -41,11 +43,16 @@ public class CalculatorLogic : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Adds a digit or dot to the current input number.
+    /// Appends a digit or a decimal point to the current number.
     /// </summary>
-    /// <param name="digit">Digit (0-9) or dot (.).</param>
+    /// <param name="digit">The digit (0–9) or decimal point (".").</param>
     public void AppendDigit(string? digit)
     {
+        if (this.hasError)
+        {
+            this.Clear();
+        }
+
         if (digit != "." && !char.IsDigit(digit ?? string.Empty, 0))
         {
             return;
@@ -57,7 +64,7 @@ public class CalculatorLogic : INotifyPropertyChanged
             this.isNewInput = false;
         }
 
-        if (digit == "." && this.inputBuffer != null && this.inputBuffer.Contains('.'))
+        if (digit == "." && this.inputBuffer.Contains('.'))
         {
             return;
         }
@@ -67,11 +74,16 @@ public class CalculatorLogic : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Sets the operator (+, -, *, /) and performs the calculation if there are two operands.
+    /// Sets the operator (+, -, *, /) and, if possible, performs the intermediate calculation.
     /// </summary>
-    /// <param name="operator">The operator.</param>
+    /// <param name="operator">The operator symbol.</param>
     public void SetOperator(string @operator)
     {
+        if (this.hasError)
+        {
+            this.Clear();
+        }
+
         if (@operator != "+" && @operator != "-" && @operator != "*" && @operator != "/")
         {
             return;
@@ -81,8 +93,7 @@ public class CalculatorLogic : INotifyPropertyChanged
         {
             if (!double.TryParse(this.inputBuffer, out var number))
             {
-                this.Display = "Error";
-                this.Clear();
+                this.DisplayError();
                 return;
             }
 
@@ -92,17 +103,14 @@ public class CalculatorLogic : INotifyPropertyChanged
             }
             else if (this.pendingOperator != null)
             {
-                try
+                if (!TryCalculate(this.currentValue!.Value, number, this.pendingOperator, out var result))
                 {
-                    this.currentValue = CalculateResult(this.currentValue!.Value, number, this.pendingOperator);
-                    this.Display = this.currentValue.ToString();
-                }
-                catch (Exception)
-                {
-                    this.Display = "Error";
-                    this.Clear();
+                    this.DisplayError();
                     return;
                 }
+
+                this.currentValue = result;
+                this.Display = this.currentValue.ToString();
             }
 
             this.inputBuffer = string.Empty;
@@ -114,41 +122,54 @@ public class CalculatorLogic : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Performs the final calculation.
+    /// Performs the final calculation and updates the display.
     /// </summary>
     public void Calculate()
     {
-        if (string.IsNullOrEmpty(this.inputBuffer) || this.pendingOperator == null)
+        if (this.hasError)
+        {
+            return;
+        }
+
+        if (this.pendingOperator == null || string.IsNullOrEmpty(this.inputBuffer))
         {
             return;
         }
 
         if (!double.TryParse(this.inputBuffer, out var secondNumber))
         {
-            this.Display = "Error";
-            this.Clear();
+            this.DisplayError();
             return;
         }
 
-        try
+        if (this.currentValue == null)
         {
-            this.currentValue = CalculateResult(this.currentValue!.Value, secondNumber, this.pendingOperator);
-            this.Display = this.currentValue.ToString();
-        }
-        catch (Exception)
-        {
-            this.Display = "Error";
-            this.Clear();
+            this.currentValue = secondNumber;
+            this.Display = secondNumber.ToString(CultureInfo.InvariantCulture);
+            this.inputBuffer = string.Empty;
+            this.isNewInput = true;
+            this.pendingOperator = null;
             return;
         }
+
+        if (!TryCalculate(this.currentValue.Value, secondNumber, this.pendingOperator, out var result))
+        {
+            this.DisplayError();
+            return;
+        }
+
+        this.currentValue = result;
+        this.Display = result.ToString(CultureInfo.InvariantCulture);
 
         this.inputBuffer = string.Empty;
         this.isNewInput = true;
         this.pendingOperator = null;
     }
 
+
+
     /// <summary>
-    /// Completely resets the calculator state.
+    /// Completely clears the calculator state.
     /// </summary>
     public void Clear()
     {
@@ -156,50 +177,77 @@ public class CalculatorLogic : INotifyPropertyChanged
         this.pendingOperator = null;
         this.inputBuffer = string.Empty;
         this.isNewInput = true;
+        this.hasError = false;
         this.Display = "0";
     }
 
     /// <summary>
-    /// Resets the current input, saving the result and the operator.
+    /// Clears the current entry while keeping the stored result and operator.
     /// </summary>
     public void ClearEnter()
     {
+        if (this.hasError)
+        {
+            this.Clear();
+            return;
+        }
+
         this.inputBuffer = string.Empty;
         this.isNewInput = true;
         this.Display = this.currentValue?.ToString() ?? "0";
     }
 
     /// <summary>
-    /// Removes the last digit from the current input.
+    /// Deletes the last entered digit.
     /// </summary>
     public void Backspace()
     {
-        if (this.isNewInput || this.inputBuffer is { Length: <= 0 })
+        if (this.hasError)
+        {
+            this.Clear();
+            return;
+        }
+
+        if (this.isNewInput || this.inputBuffer.Length <= 0)
         {
             return;
         }
 
-        this.inputBuffer = this.inputBuffer?[..^1];
-        this.Display = this.inputBuffer is { Length: > 0 } ? this.inputBuffer : "0";
+        this.inputBuffer = this.inputBuffer[..^1];
+        this.Display = this.inputBuffer.Length > 0 ? this.inputBuffer : "0";
     }
 
     /// <summary>
-    /// Performs the calculation of two numbers with the specified operator.
+    /// Attempts to calculate a result using two operands and an operator.
     /// </summary>
-    /// <param name="first">The first operand.</param>
-    /// <param name="second">The second operand.</param>
-    /// <param name="operator">The operator.</param>
-    /// <returns>The result of the calculation.</returns>
-    private static double CalculateResult(double first, double second, string @operator)
+    private static bool TryCalculate(double first, double second, string @operator, out double result)
     {
-        return @operator switch
+        try
         {
-            "+" => first + second,
-            "-" => first - second,
-            "*" => first * second,
-            "/" => second != 0 ? first / second : throw new DivideByZeroException(),
-            _ => throw new InvalidOperationException("Unknown operator"),
-        };
+            result = @operator switch
+            {
+                "+" => first + second,
+                "-" => first - second,
+                "*" => first * second,
+                "/" => second != 0 ? first / second : throw new DivideByZeroException(),
+                _ => throw new InvalidOperationException("Unknown operator"),
+            };
+            return true;
+        }
+        catch
+        {
+            result = 0;
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Displays "Error" and blocks further input until user starts new entry.
+    /// </summary>
+    private void DisplayError()
+    {
+        this.Display = "Error";
+        this.hasError = true;
     }
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
