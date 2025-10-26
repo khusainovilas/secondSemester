@@ -40,11 +40,6 @@ public class CalculatorLogic : INotifyPropertyChanged
         }
     }
 
-    private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-    {
-        this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-
     /// <summary>
     /// Adds a digit or dot to the current input number.
     /// </summary>
@@ -153,25 +148,6 @@ public class CalculatorLogic : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Performs the calculation of two numbers with the specified operator.
-    /// </summary>
-    /// <param name="first">The first operand.</param>
-    /// <param name="second">The second operand.</param>
-    /// <param name="operator">The operator.</param>
-    /// <returns>The result of the calculation.</returns>
-    private static double CalculateResult(double first, double second, string @operator)
-    {
-        return @operator switch
-        {
-            "+" => first + second,
-            "-" => first - second,
-            "*" => first * second,
-            "/" => second != 0 ? first / second : throw new DivideByZeroException(),
-            _ => throw new InvalidOperationException("Unknown operator"),
-        };
-    }
-
-    /// <summary>
     /// Completely resets the calculator state.
     /// </summary>
     public void Clear()
@@ -205,5 +181,29 @@ public class CalculatorLogic : INotifyPropertyChanged
 
         this.inputBuffer = this.inputBuffer?[..^1];
         this.Display = this.inputBuffer is { Length: > 0 } ? this.inputBuffer : "0";
+    }
+
+    /// <summary>
+    /// Performs the calculation of two numbers with the specified operator.
+    /// </summary>
+    /// <param name="first">The first operand.</param>
+    /// <param name="second">The second operand.</param>
+    /// <param name="operator">The operator.</param>
+    /// <returns>The result of the calculation.</returns>
+    private static double CalculateResult(double first, double second, string @operator)
+    {
+        return @operator switch
+        {
+            "+" => first + second,
+            "-" => first - second,
+            "*" => first * second,
+            "/" => second != 0 ? first / second : throw new DivideByZeroException(),
+            _ => throw new InvalidOperationException("Unknown operator"),
+        };
+    }
+
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }
