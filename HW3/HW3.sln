@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalculatorCore", "CalculatorCore\CalculatorCore.csproj", "{5D070A5B-FA66-416C-B482-A5396D4A04C1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalculatorCore.Test", "CalculatorCore.Test\CalculatorCore.Test.csproj", "{A7EE239C-A0EC-48F7-92F1-C6B5DB9973E5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{5D070A5B-FA66-416C-B482-A5396D4A04C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5D070A5B-FA66-416C-B482-A5396D4A04C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5D070A5B-FA66-416C-B482-A5396D4A04C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7EE239C-A0EC-48F7-92F1-C6B5DB9973E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7EE239C-A0EC-48F7-92F1-C6B5DB9973E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7EE239C-A0EC-48F7-92F1-C6B5DB9973E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7EE239C-A0EC-48F7-92F1-C6B5DB9973E5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
