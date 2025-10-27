@@ -53,11 +53,11 @@ public class CalculatorTest
     public void CalculatorLogic_AppendDigit_DoubleDot_IsIgnored()
     {
         this.calculator.AppendDigit("1");
-        this.calculator.AppendDigit(".");
-        this.calculator.AppendDigit(".");
+        this.calculator.AppendDigit(",");
+        this.calculator.AppendDigit(",");
         this.calculator.AppendDigit("5");
 
-        Assert.That(this.calculator.Display, Is.EqualTo("1.5"));
+        Assert.That(this.calculator.Display, Is.EqualTo("1,5"));
     }
 
     /// <summary>

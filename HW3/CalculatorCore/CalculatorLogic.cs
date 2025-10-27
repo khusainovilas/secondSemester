@@ -53,7 +53,12 @@ public class CalculatorLogic : INotifyPropertyChanged
             this.Clear();
         }
 
-        if (digit != "." && !char.IsDigit(digit ?? string.Empty, 0))
+        if (digit is "," or ".")
+        {
+            digit = ",";
+        }
+
+        if (digit != "," && !char.IsDigit(digit ?? string.Empty, 0))
         {
             return;
         }
@@ -64,12 +69,18 @@ public class CalculatorLogic : INotifyPropertyChanged
             this.isNewInput = false;
         }
 
-        if (digit == "." && this.inputBuffer.Contains('.'))
+        switch (digit)
         {
-            return;
+            case "," when this.inputBuffer.Contains(','):
+                return;
+            case "," when string.IsNullOrEmpty(this.inputBuffer):
+                this.inputBuffer = "0,";
+                break;
+            default:
+                this.inputBuffer += digit;
+                break;
         }
 
-        this.inputBuffer += digit;
         this.Display = this.inputBuffer.Length > 0 ? this.inputBuffer : "0";
     }
 
@@ -91,7 +102,7 @@ public class CalculatorLogic : INotifyPropertyChanged
 
         if (!string.IsNullOrEmpty(this.inputBuffer))
         {
-            if (!double.TryParse(this.inputBuffer, out var number))
+            if (!TryParseInput(this.inputBuffer, out var number))
             {
                 this.DisplayError();
                 return;
@@ -103,14 +114,14 @@ public class CalculatorLogic : INotifyPropertyChanged
             }
             else if (this.pendingOperator != null)
             {
-                if (!TryCalculate(this.currentValue!.Value, number, this.pendingOperator, out var result))
+                if (!TryCalculate(this.currentValue.Value, number, this.pendingOperator, out var result))
                 {
                     this.DisplayError();
                     return;
                 }
 
                 this.currentValue = result;
-                this.Display = this.currentValue.ToString();
+                this.Display = ConvertToDisplay(result);
             }
 
             this.inputBuffer = string.Empty;
@@ -118,7 +129,7 @@ public class CalculatorLogic : INotifyPropertyChanged
         }
 
         this.pendingOperator = @operator;
-        this.Display = this.currentValue?.ToString() ?? "0";
+        this.Display = this.currentValue != null ? ConvertToDisplay(this.currentValue.Value) : "0";
     }
 
     /// <summary>
@@ -136,7 +147,12 @@ public class CalculatorLogic : INotifyPropertyChanged
             return;
         }
 
-        if (!double.TryParse(this.inputBuffer, out var secondNumber))
+        if (this.inputBuffer.EndsWith(','))
+        {
+            this.inputBuffer = this.inputBuffer[..^1];
+        }
+
+        if (!TryParseInput(this.inputBuffer, out var secondNumber))
         {
             this.DisplayError();
             return;
@@ -145,7 +161,7 @@ public class CalculatorLogic : INotifyPropertyChanged
         if (this.currentValue == null)
         {
             this.currentValue = secondNumber;
-            this.Display = secondNumber.ToString(CultureInfo.InvariantCulture);
+            this.Display = ConvertToDisplay(secondNumber);
             this.inputBuffer = string.Empty;
             this.isNewInput = true;
             this.pendingOperator = null;
@@ -159,14 +175,12 @@ public class CalculatorLogic : INotifyPropertyChanged
         }
 
         this.currentValue = result;
-        this.Display = result.ToString(CultureInfo.InvariantCulture);
+        this.Display = ConvertToDisplay(result);
 
         this.inputBuffer = string.Empty;
         this.isNewInput = true;
         this.pendingOperator = null;
     }
-
-
 
     /// <summary>
     /// Completely clears the calculator state.
@@ -192,9 +206,17 @@ public class CalculatorLogic : INotifyPropertyChanged
             return;
         }
 
+        if (this.isNewInput && string.IsNullOrEmpty(this.inputBuffer))
+        {
+            this.currentValue = null;
+            this.pendingOperator = null;
+            this.Display = "0";
+            return;
+        }
+
         this.inputBuffer = string.Empty;
         this.isNewInput = true;
-        this.Display = this.currentValue?.ToString() ?? "0";
+        this.Display = this.currentValue != null ? ConvertToDisplay(this.currentValue.Value) : "0";
     }
 
     /// <summary>
@@ -208,8 +230,17 @@ public class CalculatorLogic : INotifyPropertyChanged
             return;
         }
 
-        if (this.isNewInput || this.inputBuffer.Length <= 0)
+        if (this.isNewInput && string.IsNullOrEmpty(this.inputBuffer))
         {
+            this.inputBuffer = this.Display ?? "0";
+            this.isNewInput = false;
+            this.currentValue = null;
+            this.pendingOperator = null;
+        }
+
+        if (this.inputBuffer.Length <= 0)
+        {
+            this.Display = "0";
             return;
         }
 
@@ -217,9 +248,6 @@ public class CalculatorLogic : INotifyPropertyChanged
         this.Display = this.inputBuffer.Length > 0 ? this.inputBuffer : "0";
     }
 
-    /// <summary>
-    /// Attempts to calculate a result using two operands and an operator.
-    /// </summary>
     private static bool TryCalculate(double first, double second, string @operator, out double result)
     {
         try
@@ -241,9 +269,16 @@ public class CalculatorLogic : INotifyPropertyChanged
         }
     }
 
-    /// <summary>
-    /// Displays "Error" and blocks further input until user starts new entry.
-    /// </summary>
+    private static bool TryParseInput(string input, out double number)
+    {
+        return double.TryParse(input, NumberStyles.Float, new CultureInfo("ru-RU"), out number);
+    }
+
+    private static string ConvertToDisplay(double number)
+    {
+        return number.ToString(new CultureInfo("ru-RU"));
+    }
+
     private void DisplayError()
     {
         this.Display = "Error";

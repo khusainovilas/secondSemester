@@ -43,7 +43,7 @@ public partial class MainWindow
             return;
         }
 
-        if (char.IsDigit(buttonContent, 0) || buttonContent == ".")
+        if (char.IsDigit(buttonContent, 0) || buttonContent == ",")
         {
             this.calculatorLogic.AppendDigit(buttonContent);
         }
