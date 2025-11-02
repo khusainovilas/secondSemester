@@ -49,12 +49,9 @@ public static class Linq
     {
         ArgumentNullException.ThrowIfNull(sequence);
 
-        switch (count)
+        if (count <= 0)
         {
-            case < 0:
-                throw new ArgumentOutOfRangeException(nameof(count), "Count cannot be negative.");
-            case 0:
-                yield break;
+            yield break;
         }
 
         var taken = 0;
@@ -80,9 +77,17 @@ public static class Linq
     {
         ArgumentNullException.ThrowIfNull(sequence);
 
-        if (count < 0)
+        if (count <= 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(count), "Count cannot be negative.");
+            if (count == 0)
+            {
+                foreach (var item in sequence)
+                {
+                    yield return item;
+                }
+            }
+
+            yield break;
         }
 
         var skipped = 0;
