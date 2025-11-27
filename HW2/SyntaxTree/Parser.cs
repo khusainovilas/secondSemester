@@ -21,166 +21,73 @@ public static class Parser
             throw new ArgumentException("Input cannot be empty or whitespace.");
         }
 
-        var tokens = Tokenize(input);
-        var index = 0;
-        var result = ParseExpression(tokens, ref index);
+        if (!AreParenthesesBalanced(input))
+        {
+            throw new ArgumentException("Unbalanced parentheses.");
+        }
 
-        if (index != tokens.Count)
+        var tokens = input
+            .Replace('(', ' ')
+            .Replace(')', ' ')
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+        var pos = 0;
+        var node = ParseExpression(tokens, ref pos);
+
+        if (pos != tokens.Length)
         {
             throw new ArgumentException("Extra tokens after parsing complete expression.");
         }
 
-        return result;
+        return node;
     }
 
-    /// <summary>
-    /// Tokenizes the input string into a list of tokens.
-    /// </summary>
-    /// <param name="input">The input string to tokenize.</param>
-    /// <returns>A list of tokens.</returns>
-    private static List<string> Tokenize(string input)
+    private static IAbstractNode ParseExpression(string[] tokens, ref int pos)
     {
-        var tokens = new List<string>();
-        var currentIndex = 0;
-
-        while (currentIndex < input.Length)
+        if (pos >= tokens.Length)
         {
-            var currentChar = input[currentIndex];
-
-            if (char.IsWhiteSpace(currentChar))
-            {
-                currentIndex++;
-                continue;
-            }
-
-            switch (currentChar)
-            {
-                case '(':
-                case ')':
-                case '+':
-                case '*':
-                case '/':
-                    tokens.Add(currentChar.ToString());
-                    currentIndex++;
-                    continue;
-
-                case '-':
-                {
-                    if (currentIndex + 1 < input.Length && char.IsDigit(input[currentIndex + 1]))
-                    {
-                        var start = currentIndex;
-                        currentIndex++;
-                        while (currentIndex < input.Length && char.IsDigit(input[currentIndex]))
-                        {
-                            currentIndex++;
-                        }
-
-                        tokens.Add(input.Substring(start, currentIndex - start));
-                    }
-                    else
-                    {
-                        tokens.Add(currentChar.ToString());
-                        currentIndex++;
-                    }
-
-                    continue;
-                }
-            }
-
-            if (char.IsDigit(currentChar))
-            {
-                var start = currentIndex;
-                while (currentIndex < input.Length && char.IsDigit(input[currentIndex]))
-                {
-                    currentIndex++;
-                }
-
-                tokens.Add(input.Substring(start, currentIndex - start));
-                continue;
-            }
-
-            throw new ArgumentException($"Invalid character '{currentChar}' at position {currentIndex}.");
+            throw new ArgumentException("Unexpected end of input.");
         }
 
-        return tokens;
+        var token = tokens[pos++];
+        if (int.TryParse(token, out var value))
+        {
+            return new NumberNode(value);
+        }
+
+        if (token.Length != 1 || !"+-*/".Contains(token[0]))
+        {
+            throw new ArgumentException($"Invalid operator: {token}");
+        }
+
+        var op = token[0];
+        var left = ParseExpression(tokens, ref pos);
+        var right = ParseExpression(tokens, ref pos);
+
+        return new BinaryOperationNode(op, left, right);
     }
 
-    // <summary>
-    // Parse a list of tokens.
-    // </summary>
-    // <param name="tokens">The list of tokens.</param>
-    // <param name="index">The current token index.</param>
-    // <returns>The parsed node.</returns>
-    private static IAbstractNode ParseExpression(List<string> tokens, ref int index)
+    private static bool AreParenthesesBalanced(string s)
     {
-        var operators = new Stack<string>();
-        var nodes = new Stack<IAbstractNode>();
-
-        while (index < tokens.Count)
+        var balance = 0;
+        foreach (var c in s)
         {
-            var token = tokens[index];
-
-            if (int.TryParse(token, out var value))
+            if (c == '(')
             {
-                nodes.Push(new NumberNode(value));
-                index++;
+                balance++;
             }
-            else if (token == "(")
+
+            if (c == ')')
             {
-                operators.Push(token);
-                index++;
+                balance--;
             }
-            else if ("+-*/".Contains(token))
+
+            if (balance < 0)
             {
-                if (operators.Count == 0 || operators.Peek() != "(")
-                {
-                    throw new ArgumentException($"Expected '(', found '{token}' at position {index}.");
-                }
-
-                operators.Push(token);
-                index++;
-            }
-            else if (token == ")")
-            {
-                if (operators.Count < 2 || operators.Peek() == "(")
-                {
-                    throw new ArgumentException($"Missing operation before ')' at position {index}.");
-                }
-
-                var op = operators.Pop();
-                if (operators.Peek() != "(")
-                {
-                    throw new ArgumentException($"Missing opening '(' before position {index}.");
-                }
-
-                operators.Pop();
-
-                if (nodes.Count < 2)
-                {
-                    throw new ArgumentException($"Missing operands for operation '{op}' at position {index}.");
-                }
-
-                var right = nodes.Pop();
-                var left = nodes.Pop();
-                nodes.Push(new BinaryOperationNode(op[0], left, right));
-                index++;
-            }
-            else
-            {
-                throw new ArgumentException($"Unexpected token '{token}' at position {index}.");
+                return false;
             }
         }
 
-        if (operators.Count > 0)
-        {
-            throw new ArgumentException("Missing closing ')'.");
-        }
-
-        if (nodes.Count != 1)
-        {
-            throw new ArgumentException("Incomplete expression.");
-        }
-
-        return nodes.Pop();
+        return balance == 0;
     }
 }
