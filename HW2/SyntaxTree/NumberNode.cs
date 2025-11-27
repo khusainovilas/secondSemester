@@ -7,17 +7,11 @@ namespace SyntaxTree;
 /// <summary>
 /// Represents a number node in the syntax tree.
 /// </summary>
-public class NumberNode(int value) : AbstractNode
+public class NumberNode(int value) : IAbstractNode
 {
     /// <inheritdoc/>
-    public override int Calculate()
-    {
-        return value;
-    }
+    public int Calculate() => value;
 
     /// <inheritdoc/>
-    public override string ToStringRepresentation()
-    {
-        return value.ToString();
-    }
+    public string ToStringRepresentation() => value.ToString();
 }

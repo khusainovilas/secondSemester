@@ -7,11 +7,11 @@ namespace SyntaxTree;
 /// <summary>
 /// Represents a binary operation node in the syntax tree.
 /// </summary>
-public class BinaryOperationNode : AbstractNode
+public class BinaryOperationNode : IAbstractNode
 {
     private readonly char operation;
-    private readonly AbstractNode leftNode;
-    private readonly AbstractNode rightNode;
+    private readonly IAbstractNode leftNode;
+    private readonly IAbstractNode rightNode;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BinaryOperationNode"/> class.
@@ -19,7 +19,7 @@ public class BinaryOperationNode : AbstractNode
     /// <param name="operation">The operation character (+, -, *, /).</param>
     /// <param name="leftNode">The left operand node.</param>
     /// <param name="rightNode">The right operand node.</param>
-    public BinaryOperationNode(char operation, AbstractNode leftNode, AbstractNode rightNode)
+    public BinaryOperationNode(char operation, IAbstractNode leftNode, IAbstractNode rightNode)
     {
         this.operation = operation;
         this.leftNode = leftNode ?? throw new ArgumentNullException(nameof(leftNode));
@@ -28,7 +28,7 @@ public class BinaryOperationNode : AbstractNode
     }
 
     /// <inheritdoc/>
-    public override int Calculate()
+    public int Calculate()
     {
         var leftValue = this.leftNode.Calculate();
         var rightValue = this.rightNode.Calculate();
@@ -44,11 +44,8 @@ public class BinaryOperationNode : AbstractNode
     }
 
     /// <inheritdoc/>
-    public override string ToStringRepresentation()
-    {
-        return
-            $"({this.operation} {this.leftNode.ToStringRepresentation()} {this.rightNode.ToStringRepresentation()})";
-    }
+    public string ToStringRepresentation() =>
+        $"({this.operation} {this.leftNode.ToStringRepresentation()} {this.rightNode.ToStringRepresentation()})";
 
     private void Validate()
     {

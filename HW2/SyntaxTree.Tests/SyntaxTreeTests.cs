@@ -11,7 +11,6 @@ public class SyntaxTreeTests
 {
     private StringWriter consoleOutput;
 
-    // Set up common test environment before each test.
     [SetUp]
     public void SetUp()
     {
@@ -19,7 +18,6 @@ public class SyntaxTreeTests
         Console.SetOut(this.consoleOutput);
     }
 
-    // Clean up after each test.
     [TearDown]
     public void TearDown()
     {
@@ -27,7 +25,9 @@ public class SyntaxTreeTests
         Console.SetOut(new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true });
     }
 
-    // Test parsing a valid expression with multiplication and addition.
+    /// <summary>
+    /// Test parsing a valid expression with multiplication and addition.
+    /// </summary>
     [Test]
     public void Parser_Parse_ValidExpression_ReturnsCorrectTreeAndResult()
     {
@@ -40,7 +40,9 @@ public class SyntaxTreeTests
         });
     }
 
-    // Test parsing an expression with negative numbers.
+    /// <summary>
+    /// Test parsing an expression with negative numbers.
+    /// </summary>
     [Test]
     public void Parser_Parse_NegativeNumber_ReturnsCorrectResult()
     {
@@ -53,28 +55,36 @@ public class SyntaxTreeTests
         });
     }
 
-    // Test parsing an empty input throws ArgumentException.
+    /// <summary>
+    /// Test parsing an empty input throws ArgumentException.
+    /// </summary>
     [Test]
     public void Parser_Parse_EmptyInput_ThrowsArgumentException()
     {
         Assert.Throws<ArgumentException>(() => Parser.Parse(string.Empty));
     }
 
-    // Test parsing an invalid token throws ArgumentException.
+    /// <summary>
+    /// Test parsing an invalid token throws ArgumentException.
+    /// </summary>
     [Test]
     public void Parser_Parse_InvalidToken_ThrowsArgumentException()
     {
         Assert.Throws<ArgumentException>(() => Parser.Parse("(+ 1 a)"));
     }
 
-    // Test parsing unbalanced parentheses throws ArgumentException.
+    /// <summary>
+    /// Test parsing unbalanced parentheses throws ArgumentException.
+    /// </summary>
     [Test]
     public void Parser_Parse_UnbalancedParentheses_ThrowsArgumentException()
     {
         Assert.Throws<ArgumentException>(() => Parser.Parse("(( 1 2)"));
     }
 
-    // Test parsing division by zero throws DivideByZeroException in Calculate.
+    /// <summary>
+    /// Test parsing division by zero throws DivideByZeroException in Calculate.
+    /// </summary>
     [Test]
     public void Parser_Parse_DivisionByZero_ThrowsDivideByZeroException()
     {
@@ -84,7 +94,9 @@ public class SyntaxTreeTests
         Assert.Throws<DivideByZeroException>(() => tree.Calculate());
     }
 
-    // Test NumberNode calculation and string representation.
+    /// <summary>
+    /// Test NumberNode calculation and string representation.
+    /// </summary>
     [Test]
     public void NumberNode_CalculateAndToString_ReturnsCorrectValues()
     {
@@ -96,7 +108,9 @@ public class SyntaxTreeTests
         });
     }
 
-    // Test BinaryOperationNode calculation and string representation.
+    /// <summary>
+    /// Test BinaryOperationNode calculation and string representation.
+    /// </summary>
     [Test]
     public void BinaryOperationNode_CalculateAndToString_ReturnsCorrectValues()
     {
@@ -108,17 +122,33 @@ public class SyntaxTreeTests
         });
     }
 
-    // Test Program.Main with testFile.txt containing valid expression.
+    /// <summary>
+    /// Test subtraction (non-commutative operation) works correctly.
+    /// </summary>
     [Test]
-    public void Program_Main_ValidFileOutputs()
+    public void Parser_Parse_Subtraction_ReturnsCorrectResult()
     {
-        const string filePath = "testFile.txt";
-        Program.Main(new[] { filePath });
-        var output = this.consoleOutput.ToString().Trim();
+        const string input = "(- 10 4)";
+        var tree = Parser.Parse(input);
         Assert.Multiple(() =>
         {
-            Assert.That(output, Does.Contain("The tree: (+ 1 2)"));
-            Assert.That(output, Does.Contain("The result: 3"));
+            Assert.That(tree.ToStringRepresentation(), Is.EqualTo("(- 10 4)"));
+            Assert.That(tree.Calculate(), Is.EqualTo(6));
+        });
+    }
+
+    /// <summary>
+    /// Test division (non-commutative operation) works correctly and doesn't swap operands.
+    /// </summary>
+    [Test]
+    public void Parser_Parse_Division_ReturnsCorrectResult()
+    {
+        const string input = "(/ 10 2)";
+        var tree = Parser.Parse(input);
+        Assert.Multiple(() =>
+        {
+            Assert.That(tree.ToStringRepresentation(), Is.EqualTo("(/ 10 2)"));
+            Assert.That(tree.Calculate(), Is.EqualTo(5));
         });
     }
 }

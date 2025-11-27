@@ -14,7 +14,7 @@ public static class Parser
     /// </summary>
     /// <param name="input">The input string in prefix notation.</param>
     /// <returns>The root node of the syntax tree.</returns>
-    public static AbstractNode Parse(string input)
+    public static IAbstractNode Parse(string input)
     {
         if (string.IsNullOrWhiteSpace(input))
         {
@@ -111,10 +111,10 @@ public static class Parser
     // <param name="tokens">The list of tokens.</param>
     // <param name="index">The current token index.</param>
     // <returns>The parsed node.</returns>
-    private static AbstractNode ParseExpression(List<string> tokens, ref int index)
+    private static IAbstractNode ParseExpression(List<string> tokens, ref int index)
     {
         var operators = new Stack<string>();
-        var nodes = new Stack<AbstractNode>();
+        var nodes = new Stack<IAbstractNode>();
 
         while (index < tokens.Count)
         {
