@@ -64,7 +64,14 @@ public static class Parser
         var left = ParseExpression(tokens, ref pos);
         var right = ParseExpression(tokens, ref pos);
 
-        return new BinaryOperationNode(op, left, right);
+        return op switch
+        {
+            '+' => new Add(left, right),
+            '-' => new Subtract(left, right),
+            '*' => new Multiply(left, right),
+            '/' => new Divide(left, right),
+            _ => throw new ArgumentException($"Unknown operator: {op}"),
+        };
     }
 
     private static bool AreParenthesesBalanced(string s)

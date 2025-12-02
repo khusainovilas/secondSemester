@@ -109,12 +109,13 @@ public class SyntaxTreeTests
     }
 
     /// <summary>
-    /// Test BinaryOperationNode calculation and string representation.
+    /// Test that Add node calculates and prints correctly.
     /// </summary>
     [Test]
-    public void BinaryOperationNode_CalculateAndToString_ReturnsCorrectValues()
+    public void Add_CalculateAndToString_ReturnsCorrectValues()
     {
-        var node = new BinaryOperationNode('+', new NumberNode(1), new NumberNode(2));
+        var node = new Add(new NumberNode(1), new NumberNode(2));
+    
         Assert.Multiple(() =>
         {
             Assert.That(node.Calculate(), Is.EqualTo(3));
